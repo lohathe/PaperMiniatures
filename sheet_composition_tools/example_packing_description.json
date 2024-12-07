@@ -1,0 +1,26 @@
+{
+    "output": {
+        "width": 210,
+        "height": 297,
+        "PPI": 300
+    },
+    "miniature_composition": {
+        "support_height": 14,
+        "support_color": [200, 200, 200],
+        "padding": 8
+    },
+    "images": [
+        {
+            "path": "../images/animals/boar_1.png",
+            "quantity": 1
+        },
+        {
+            "path": "../images/animals/boar_2.png",
+            "quantity": 5
+        },
+        {
+            "path": "../images/animals/boar_3.png",
+            "quantity": 10
+        }
+    ]
+}
