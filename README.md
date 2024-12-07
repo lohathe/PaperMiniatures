@@ -11,5 +11,5 @@ The main goals for these miniatures are:
 
 This repo offers:
  * a guide on [how to create paper miniatures](docs/how_to_create_paper_miniatures.md)
- * images for some possible miniatures
+ * [images](./images/) for some possible miniatures
  * a program to ease the creation of a sheet full of images that can be used to create paper miniatures
