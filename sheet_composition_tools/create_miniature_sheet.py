@@ -5,14 +5,16 @@ import packing_algos
 
 
 def main():
+    def auto_int(x):
+        return int(x, 0)
     parser = argparse.ArgumentParser()
     parser.add_argument("description_file",
         type=str,
         help="JSON file describing the expected output.")
-    parser.add_argument("-p", "--packing_algorithm",
-        type=int,
+    parser.add_argument("-f", "--algo_flags",
+        type=auto_int,
         default=1,
-        help="Which algorithm to use (not documented, see source code).")
+        help="Flags for the packing algoritm.")
     parser.add_argument("-o", "--output_name",
         type=str,
         default="output",
@@ -23,9 +25,10 @@ def main():
         descr = json.load(f)
 
     images = []
+    quantities = []
     for i, element in enumerate(descr["images"]):
         try:
-            miniature = images_utils.createSimmetricMiniature(
+            miniature_image = images_utils.createSimmetricMiniature(
                 element["path"],
                 descr["miniature_composition"],
                 descr["output"]["PPI"])
@@ -33,26 +36,20 @@ def main():
             print("[ERROR] on image {} (file {})".format(i, element["path"]))
             raise
 
-        images.append( (miniature, element["quantity"]) )
+        images.append(miniature_image)
+        quantities.append(element["quantity"])
 
     output_w_pxl = images_utils.mm2pixel(descr["output"]["width"], descr["output"]["PPI"])
     output_h_pxl = images_utils.mm2pixel(descr["output"]["height"], descr["output"]["PPI"])
-    if args.packing_algorithm == 1:
-        pack = lambda x, y: packing_algos.simplePacking(x, y, "sort-descending")
-    elif args.packing_algorithm == 2:
-        pack = lambda x, y: packing_algos.simplePacking(x, y, "sort-ascending")
-    elif args.packing_algorithm == 3:
-        pack = lambda x, y: packing_algos.simplePacking(x, y, "random")
-    elif args.packing_algorithm == 4:
-        pack = lambda x, y: packing_algos.greedyPacking(x, y, "sort-descending")
-    elif args.packing_algorithm == 5:
-        pack = lambda x, y: packing_algos.greedyPacking(x, y, "sort-ascending")
-    elif args.packing_algorithm == 6:
-        pack = lambda x, y: packing_algos.greedyPacking(x, y, "random")
-    else:
-        raise RuntimeError("unknown packing algorithm!")
-    pages_layout = pack(images, (output_w_pxl, output_h_pxl))
-    print(pages_layout)
+
+    elements = []
+    for i, image in enumerate(images):
+        elements.append(packing_algos.RectElement(i, image.size[0], image.size[1]))
+
+    pages_layout = packing_algos.computePacking(
+        zip(elements, quantities),
+        (output_w_pxl, output_h_pxl),
+        args.algo_flags)
 
     for i, page_layout in enumerate(pages_layout):
         page = images_utils.composePage(images, page_layout, descr["output"])
